@@ -30,6 +30,30 @@ namespace ExcelToHtml
         private Dictionary<string, string> TemplateFieldList;
         private Dictionary<string, string> cellStyles;
 
+        public ToHtml(Stream excelStream, string WorkSheetName = null)
+        {
+            if (excelStream == null)
+            {
+                throw new Exception("Stream is null");
+            }
+
+            Excel = new ExcelPackage(excelStream);
+
+            var workBook = new XLWorkbook(excelStream);
+
+            if (!string.IsNullOrEmpty(WorkSheetName))
+            {
+                WorkSheet = Excel.Workbook.Worksheets[WorksheetName];
+                closedWorksheet = workBook.Worksheet(WorksheetName);//closedxml only temporary to get valid colors
+            }
+            else
+            {
+                WorkSheet = Excel.Workbook.Worksheets[1];
+                closedWorksheet = workBook.Worksheet(1);//closedxml only temporary to get valid colors
+            }
+            Theme = ExcelToHtml.Theme.Init();
+        }
+
         public ToHtml(FileInfo excelFile, string WorkSheetName = null)
         {
             if (!excelFile.Exists)
@@ -52,6 +76,7 @@ namespace ExcelToHtml
             }
             Theme = ExcelToHtml.Theme.Init();
         }
+
         public ToHtml(string url, string WorkSheetName = null)
         {
             if (string.IsNullOrEmpty(url))
